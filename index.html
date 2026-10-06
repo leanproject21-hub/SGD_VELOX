@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FedEx - SGD (Sistema de Gestión Documental de Procesos)</title>
+  
+
+  <!-- Google Fonts & FontAwesome Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --fedex-purple: #4D148C;
+      --fedex-orange: #FF6600;
+      --fedex-dark: #222222;
+      --fedex-grey: #F4F5F7;
+      --fedex-border: #E0E0E0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', sans-serif; }
+    body { background-color: var(--fedex-grey); color: var(--fedex-dark); display: flex; flex-direction: column; min-height: 100vh; }
+
+    header {
+      background-color: var(--fedex-purple);
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .logo { font-size: 28px; font-weight: 900; letter-spacing: -1px; }
+    .logo span { color: var(--fedex-orange); }
+    .sub-title { font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; }
+
+    .main-container { max-width: 1100px; margin: 30px auto; padding: 0 20px; width: 100%; flex: 1; }
+
+    .upload-card {
+      background: white;
+      border-top: 5px solid var(--fedex-orange);
+      border-radius: 8px;
+      padding: 25px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      margin-bottom: 30px;
+    }
+
+    .upload-card h2 { font-size: 18px; margin-bottom: 15px; color: var(--fedex-purple); display: flex; align-items: center; gap: 10px; }
+
+    .drive-info {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 18px;
+      padding: 18px;
+      background: #faf9fc;
+      border: 1px solid var(--fedex-border);
+      border-radius: 8px;
+    }
+
+    .drive-icon {
+      width: 54px;
+      height: 54px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #efe6f8;
+      color: var(--fedex-purple);
+      font-size: 25px;
+    }
+
+    .drive-text strong {
+      display: block;
+      color: var(--fedex-purple);
+      font-size: 15px;
+      margin-bottom: 5px;
+    }
+
+    .drive-text p {
+      color: #666;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .category-shortcuts {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .category-shortcuts button {
+      background: white;
+      border: 1px solid var(--fedex-border);
+      border-radius: 7px;
+      padding: 13px 8px;
+      cursor: pointer;
+      color: #555;
+      font-size: 12px;
+      font-weight: 700;
+      min-height: 70px;
+      transition: .15s ease;
+    }
+
+    .category-shortcuts button i {
+      display: block;
+      color: var(--fedex-purple);
+      font-size: 18px;
+      margin-bottom: 7px;
+    }
+
+    .category-shortcuts button:hover {
+      border-color: var(--fedex-purple);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 7px rgba(0,0,0,.06);
+    }
+
+    .drive-note {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-top: 14px;
+      color: #777;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+
+    .page-view {
+      display: none;
+    }
+
+    .page-view.active {
+      display: block;
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #777;
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+
+    .breadcrumb button {
+      background: none;
+      border: none;
+      color: var(--fedex-purple);
+      font-weight: 700;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .category-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--fedex-purple);
+      margin-bottom: 6px;
+    }
+
+    .category-title i {
+      font-size: 24px;
+    }
+
+    .category-description {
+      color: #777;
+      font-size: 13px;
+      margin-bottom: 20px;
+    }
+
+    .document-toolbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .document-search {
+      flex: 1;
+      min-width: 260px;
+      padding: 11px 13px;
+      border: 1px solid var(--fedex-border);
+      border-radius: 5px;
+      outline: none;
+      font-size: 14px;
+    }
+
+    .document-search:focus {
+      border-color: var(--fedex-purple);
+    }
+
+    .document-count {
+      font-size: 12px;
+      color: #777;
+    }
+
+    .document-list {
+      border: 1px solid var(--fedex-border);
+      border-radius: 7px;
+      overflow: hidden;
+    }
+
+    .document-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 18px;
+      align-items: center;
+      padding: 15px 16px;
+      border-bottom: 1px solid var(--fedex-border);
+      background: white;
+    }
+
+    .document-row:last-child {
+      border-bottom: none;
+    }
+
+    .document-row:hover {
+      background: #faf9fc;
+    }
+
+    .document-name {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .document-name i {
+      color: var(--fedex-purple);
+      font-size: 19px;
+      flex: 0 0 auto;
+    }
+
+    .document-name strong {
+      display: block;
+      color: #333;
+      font-size: 14px;
+    }
+
+    .document-name small {
+      display: block;
+      color: #888;
+      font-size: 11px;
+      margin-top: 3px;
+    }
+
+    .document-type {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--fedex-purple);
+      background: #efe6f8;
+      padding: 5px 9px;
+      border-radius: 12px;
+      white-space: nowrap;
+    }
+
+    .empty-documents {
+      text-align: center;
+      padding: 55px 20px;
+      color: #888;
+      border: 1px dashed var(--fedex-border);
+      border-radius: 7px;
+      background: #fff;
+    }
+
+    .empty-documents i {
+      font-size: 34px;
+      color: #ccc;
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 800px) {
+      .document-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+    }
+
+    .drive-note i {
+      color: var(--fedex-purple);
+      margin-top: 2px;
+    }
+
+    .docs-section { background: white; border-radius: 8px; padding: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .docs-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
+    .docs-header h2 { font-size: 20px; color: var(--fedex-purple); }
+    .filter-controls { display: flex; gap: 10px; }
+
+    .table-responsive { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th { background-color: #FAF9FC; color: var(--fedex-purple); padding: 12px 15px; font-size: 13px; font-weight: 700; border-bottom: 2px solid var(--fedex-border); }
+    td { padding: 14px 15px; border-bottom: 1px solid var(--fedex-border); font-size: 14px; }
+    tr:hover { background-color: #F9F9FA; }
+
+    .badge { display: inline-block; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; background-color: #EFE6F8; color: var(--fedex-purple); }
+    .actions { display: flex; gap: 8px; }
+    .btn-action { padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px; font-weight: 700; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
+    .btn-download { background-color: var(--fedex-purple); color: white; }
+    .btn-download:hover { background-color: #3b0f6d; }
+    .btn-delete { background-color: #FFF0F0; color: #D32F2F; border: 1px solid #FFCDD2; }
+    .btn-delete:hover { background-color: #FFCDD2; }
+    .empty-msg { text-align: center; padding: 40px; color: #777; }
+    .empty-msg i { font-size: 40px; margin-bottom: 10px; color: #CCC; }
+    footer { text-align: center; padding: 20px; font-size: 12px; color: #777; margin-top: auto; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">Fed<span>Ex</span></div>
+    <div class="sub-title"><i class="fa-solid fa-sitemap"></i> SGD - Sistema de Gestión Documental</div>
+  </header>
+
+  <div class="main-container">
+
+    <!-- ==================== PORTAL PRINCIPAL ==================== -->
+    <section id="homeView" class="page-view active">
+
+      <div class="upload-card">
+        <h2><i class="fa-brands fa-google-drive"></i> Gestión de Documentación SGD</h2>
+
+        <div class="drive-info">
+          <div class="drive-icon">
+            <i class="fa-brands fa-google-drive"></i>
+          </div>
+
+          <div class="drive-text">
+            <strong>Repositorio oficial de documentación</strong>
+            <p>
+              Esta interfaz funciona como portal del SGD. Los documentos se almacenan
+              directamente en Google Drive, mientras que esta aplicación centraliza
+              el acceso y la organización.
+            </p>
+          </div>
+
+          <button type="button" class="btn-upload" onclick="abrirDrive()">
+            <i class="fa-solid fa-folder-open"></i> Abrir repositorio
+          </button>
+        </div>
+
+        <div class="category-shortcuts" style="grid-template-columns: repeat(3, 1fr);">
+          <button type="button" onclick="abrirCategoria('Flujo de Procesos')">
+            <i class="fa-solid fa-diagram-project"></i>
+            <span>Flujo de Procesos</span>
+          </button>
+
+          <button type="button" onclick="abrirCategoria('Manuales de Puesto')">
+            <i class="fa-solid fa-briefcase"></i>
+            <span>Manuales de Puesto</span>
+          </button>
+
+          <button type="button" onclick="abrirCategoria('Plantillas de Auditorías')">
+            <i class="fa-solid fa-clipboard-check"></i>
+            <span>Plantillas de Auditorías</span>
+          </button>
+        </div>
+
+        <div class="drive-note">
+          <i class="fa-solid fa-circle-info"></i>
+          <span>
+            La documentación se administra directamente desde Google Drive.
+            El SGD funciona como portal de consulta y acceso.
+          </span>
+        </div>
+      </div>
+
+      <div class="docs-section">
+        <div class="docs-header">
+          <h2>Repositorio de Procesos y Estructura</h2>
+        </div>
+
+        <div style="margin-bottom:15px;color:#777;font-size:12px;">
+          <i class="fa-solid fa-circle-info" style="color:var(--fedex-purple);"></i>
+          Selecciona una categoría para abrir directamente su carpeta en Google Drive.
+          Los documentos nuevos se reflejarán automáticamente allí.
+        </div>
+
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Repositorio / Categoría</th>
+                <th>Tipo de Documento</th>
+                <th>Ubicación</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody id="reposTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== PORTAL DE ACCESO ==================== -->
+    <!--
+      Las categorías abren directamente sus carpetas de Google Drive.
+      No se mantiene un catálogo de documentos en el HTML.
+      Todo archivo nuevo que agregues a Drive aparecerá automáticamente
+      dentro de la carpeta correspondiente.
+    -->
+
+  </div>
+
+  <footer>&copy; FedEx SGD - Sistema de Gestión Documental de Procesos y Estructura Organizacional.</footer>
+
+  <script>
+    /*
+     * ============================================================
+     * CONFIGURACIÓN DEL SGD
+     * ============================================================
+     * El HTML funciona como portal.
+     * Los documentos reales viven en Google Drive.
+     */
+
+    const DRIVE_CONFIG = {
+      root: "https://drive.google.com/drive/folders/17yTiBt0BP-rZBfZSv4ATIzCJ7EJLJgIJ?usp=sharing",
+
+      categories: {
+        "Flujo de Procesos": "https://drive.google.com/drive/folders/1JG4Z9J_IqVbIUqW2PWReMAdY_zRbyhkV?usp=sharing",
+        "Manuales de Puesto": "https://drive.google.com/drive/folders/1kL2hJY0bd408mKfwYcGQOrZOR8bgErUO?usp=sharing",
+        "Plantillas de Auditorías": "https://drive.google.com/drive/folders/11BAUZWjcO_kZIvYbboZVHkyXWe6AnLNl?usp=sharing"
+      }
+    };
+
+    const CATEGORIAS = {
+      "Flujo de Procesos": {
+        icon: "fa-diagram-project",
+        description: "Flujos y diagramas que documentan los procesos de Velox."
+      },
+
+      "Manuales de Puesto": {
+        icon: "fa-briefcase",
+        description: "Manuales y documentación asociada a los diferentes puestos."
+      },
+
+      "Plantillas de Auditorías": {
+        icon: "fa-clipboard-check",
+        description: "Plantillas y formatos utilizados para la ejecución de auditorías."
+      }
+    };
+
+    function abrirDrive() {
+      window.open(DRIVE_CONFIG.root, "_blank", "noopener,noreferrer");
+    }
+
+    function abrirCategoria(categoria) {
+      const url = DRIVE_CONFIG.categories[categoria];
+
+      if (!url) {
+        alert("No se ha configurado la carpeta de Google Drive para esta categoría.");
+        return;
+      }
+
+      window.open(url, "_blank", "noopener,noreferrer");
+    }
+
+    function renderRepositorios() {
+      const body = document.getElementById("reposTableBody");
+
+      body.innerHTML = Object.keys(CATEGORIAS).map(categoria => {
+        const datos = CATEGORIAS[categoria];
+
+        return `
+          <tr>
+            <td>
+              <i class="fa-solid ${datos.icon}"
+                 style="color:var(--fedex-purple);margin-right:8px;"></i>
+              <strong>${categoria}</strong>
+              <div style="font-size:12px;color:#777;margin-top:4px;">
+                ${datos.description}
+              </div>
+            </td>
+
+            <td>
+              <span class="badge">${categoria}</span>
+            </td>
+
+            <td>
+              <span style="font-size:13px;color:#2e7d32;">
+                <i class="fa-brands fa-google-drive"></i>
+                Google Drive
+              </span>
+            </td>
+
+            <td>
+              <div class="actions">
+                <button
+                  type="button"
+                  class="btn-action btn-download"
+                  onclick="abrirCategoria('${categoria.replaceAll("'", "\\'")}')">
+                  <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                  Abrir
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    renderRepositorios();
+  </script>
+</body>
+</html>
